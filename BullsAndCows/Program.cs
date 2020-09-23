@@ -11,7 +11,7 @@ namespace BullsAndCows
         static void Main(string[] args)
         {
             GameBullsAndCows gameBullsAndCows = new GameBullsAndCows(4, 1);
-            gameBullsAndCows.GuessPlayer();
+            gameBullsAndCows.StartGame();
         }
     }
 
@@ -53,7 +53,7 @@ namespace BullsAndCows
         /// <param name="countNumbersForBot">количество чисел, которое загадает программа боту</param>
         public GameBullsAndCows(int sizeNumber, int numberModeGame, int countNumbersForBot = 5)
         {
-            if (IsCorrectSizeNumber(sizeNumber) && IsCorrectNumberModeGame(numberModeGame))
+            if (IsCorrectInputSizeNumber(sizeNumber) && IsCorrectNumberModeGame(numberModeGame))
             {
                 _rand = new Random();
                 _sizeNumber = sizeNumber;
@@ -65,6 +65,9 @@ namespace BullsAndCows
             }
         }
 
+        /// <summary>
+        /// Запуск игры
+        /// </summary>
         public void StartGame()
         {
             switch (_numberModeGame)
@@ -104,11 +107,36 @@ namespace BullsAndCows
             _hideNumber = GetGenerateNumber(_sizeNumber);
             Console.Write($"Введите число длинной {_sizeNumber}: ");
             string inputNumber = Console.ReadLine();
-
-            if (IsCorrectInputNumber())
+            
+            List<int> _guessNumbes = new List<int>();
+            if (IsCorrectInputNumber(inputNumber))
             {
-
+                _guessNumber = ConvertStringToList(inputNumber);
+                _guessNumbes.ToString();
             }
+        }
+
+        /// <summary>
+        /// Конвертирует строку в List (число)
+        /// </summary>
+        /// <param name="number">число в строке</param>
+        /// <returns>число в виде списка</returns>
+        private List<int> ConvertStringToList(string number)
+        {
+            List<int> newNumber = new List<int>(number.Length);
+            for (int i = 0; i < number.Length; i++)
+            {
+                int tempNumber;
+                if (int.TryParse(number[i].ToString(), out tempNumber))
+                {
+                    newNumber.Add(tempNumber);
+                }
+                else
+                {
+                    throw new Exception("Вводить можно только цифры");
+                }
+            }
+            return newNumber;
         }
 
         /// <summary>
@@ -116,14 +144,14 @@ namespace BullsAndCows
         /// </summary>
         /// <param name="number">число</param>
         /// <returns></returns>
-        private bool IsCorrectInputNumber(List<int> number)
+        private bool IsCorrectInputNumber(string number)
         {
-            if (IsCorrectSizeNumber(number.Count))
+            if (IsCorrectSizeNumber(number.Length))
             {
                 int uniqueNumber = 0;
-                for (int i = 0; i < number.Count; i++)
+                for (int i = 0; i < number.Length; i++)
                 {
-                    for (int j = 0; j < number.Count; j++)
+                    for (int j = 0; j < number.Length; j++)
                     {
                         if (number[i] == number[j])
                             ++uniqueNumber;
@@ -132,6 +160,7 @@ namespace BullsAndCows
                     {
                         throw new Exception("Цифры не должны повторяться");
                     }
+                    uniqueNumber = 0;
                 }
                 return true;
             }
@@ -219,15 +248,29 @@ namespace BullsAndCows
         }
 
         /// <summary>
-        /// Проверяет корректность длины числа
+        /// Проверяет корректность длины числа при создании игры
         /// </summary>
         /// <param name="number"></param>
         /// <returns></returns>
-        private bool IsCorrectSizeNumber(int number)
+        private bool IsCorrectInputSizeNumber(int number)
         {
             if (number < 2 || number > 4)
             {
                 throw new Exception("Число должно быть 2, 3 или 4-x значным");
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Проверка длинны числа
+        /// </summary>
+        /// <param name="number">длинна числа</param>
+        /// <returns></returns>
+        private bool IsCorrectSizeNumber(int number)
+        {
+            if (number != _sizeNumber)
+            {
+                throw new Exception($"Длинна числа должна быть равна {_sizeNumber}");
             }
             return true;
         }
