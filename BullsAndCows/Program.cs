@@ -31,7 +31,21 @@ namespace BullsAndCows
             string bullsWord = (Bulls == 0) ? "быков" : (Bulls == 1) ? "бык" : "быка";
             string cowsWord = (Cows == 0) ? "коров" : (Cows == 1) ? "корова" : "коровы";
 
-            return $"{Bulls} {bullsWord}, {Cows} {cowsWord}";
+            string comment = "";
+            if (Bulls == 3 && Cows == 1)
+            {
+                comment = "Мощный ход!";
+            }
+            else if (Bulls == 0 && Cows == 0)
+            {
+                comment = "Повезло!";
+            }
+            else if(Bulls == 2 && Cows == 2)
+            {
+                comment = "Сильный ход!";
+            }
+
+            return $"{Bulls} {bullsWord}, {Cows} {cowsWord} " + comment;
         }
     }
 
@@ -43,7 +57,6 @@ namespace BullsAndCows
         private int _sizeNumber;
         private int _numberModeGame;
         private int _countNumbersForBot;
-        private bool _isWin;
 
         /// <summary>
         /// 
@@ -61,7 +74,6 @@ namespace BullsAndCows
                 _guessNumber = new List<int>(sizeNumber);
                 _numberModeGame = numberModeGame;
                 _countNumbersForBot = countNumbersForBot;
-                _isWin = false;
             }
         }
 
@@ -105,15 +117,35 @@ namespace BullsAndCows
         private void GuessPlayer()
         {
             _hideNumber = GetGenerateNumber(_sizeNumber);
-            Console.Write($"Введите число длинной {_sizeNumber}: ");
-            string inputNumber = Console.ReadLine();
-            
-            List<int> _guessNumbes = new List<int>();
-            if (IsCorrectInputNumber(inputNumber))
+            bool isNextMove = true;
+            while (isNextMove)
             {
-                _guessNumber = ConvertStringToList(inputNumber);
-                _guessNumbes.ToString();
+                Console.Write($"Введите число длинной {_sizeNumber}: ");
+                string inputNumber = Console.ReadLine();
+                if (IsCorrectInputNumber(inputNumber))
+                {
+                    _guessNumber = ConvertStringToList(inputNumber);
+
+                    BullsAndCows bullsAndCows = GetBullsAndCows();
+                    Console.WriteLine(bullsAndCows.GetInfo());
+
+                    if (IsWin(bullsAndCows))
+                    {
+                        isNextMove = false;
+                        Console.WriteLine("Мууу! Победа!");
+                    }
+                }
             }
+        }
+
+        /// <summary>
+        /// Проверка победы
+        /// </summary>
+        /// <param name="bullsAndCows">количество быков и коров</param>
+        /// <returns></returns>
+        private bool IsWin(BullsAndCows bullsAndCows)
+        {
+            return bullsAndCows.Bulls == _sizeNumber;
         }
 
         /// <summary>
@@ -176,21 +208,21 @@ namespace BullsAndCows
         /// <param name="startNumber">число, которое загадали</param>
         /// <param name="currentNumber">предположительное число</param>
         /// <returns>Количество быков и коров в числе currentNumber</returns>
-        private BullsAndCows GetBullsAndCows(List<int> startNumber, List<int> currentNumber)
+        private BullsAndCows GetBullsAndCows()
         {
             int bulls = 0;
             int cows = 0;
 
-            for (int i = 0; i < startNumber.Count; i++)
+            for (int i = 0; i < _hideNumber.Count; i++)
             {
-                if (startNumber[i] == currentNumber[i])
+                if (_hideNumber[i] == _guessNumber[i])
                 {
                     ++bulls;
                     continue;
                 }
-                for (int j = 0; j < startNumber.Count; j++)
+                for (int j = 0; j < _hideNumber.Count; j++)
                 {
-                    if (startNumber[i] == currentNumber[j])
+                    if (_hideNumber[i] == _guessNumber[j])
                     {
                         ++cows;
                         break;
