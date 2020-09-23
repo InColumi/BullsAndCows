@@ -10,12 +10,13 @@ namespace BullsAndCows
     {
         static void Main(string[] args)
         {
-            GameBullsAndCows bullsAndCows = new GameBullsAndCows(4, 1);
-            Random rand = new Random();
-            for (int i = 0; i < 10; i++)
-            {
-                Console.WriteLine(new BullsAndCows(rand.Next(0, 10), rand.Next(0, 10)).GetInfo());
-            }
+            GameBullsAndCows gameBullsAndCows = new GameBullsAndCows(4, 1);
+            gameBullsAndCows.GuessPlayer();
+            //Random rand = new Random();
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    Console.WriteLine(new BullsAndCows(rand.Next(0, 5), rand.Next(0, 5)).GetInfo());
+            //}
         }
     }
 
@@ -32,8 +33,8 @@ namespace BullsAndCows
 
         public string GetInfo()
         {
-            string bullsWord = (Bulls == 0 || Bulls >= 5 && Bulls <= 9) ? "быков" : (Bulls == 1) ? "бык" : "быка";
-            string cowsWord = (Cows == 0 || Cows >= 5 && Cows <= 9) ? "коров" : (Cows == 1) ? "корова" : "коровы";
+            string bullsWord = (Bulls == 0) ? "быков" : (Bulls == 1) ? "бык" : "быка";
+            string cowsWord = (Cows == 0) ? "коров" : (Cows == 1) ? "корова" : "коровы";
 
             return $"{Bulls} {bullsWord}, {Cows} {cowsWord}";
         }
@@ -103,10 +104,39 @@ namespace BullsAndCows
         /// <summary>
         /// Игрок угадывает число загаданное программой
         /// </summary>
-        private void GuessPlayer()
+        public void GuessPlayer()
         {
             _hideNumber = GetGenerateNumber(_sizeNumber);
+        }
 
+        /// <summary>
+        /// Возвращает быков и коров в числе currentNumber
+        /// </summary>
+        /// <param name="startNumber">число, которое загадали</param>
+        /// <param name="currentNumber">предположительное число</param>
+        /// <returns>Количество быков и коров в числе currentNumber</returns>
+        private BullsAndCows GetBullsAndCows(List<int> startNumber, List<int> currentNumber)
+        {
+            int bulls = 0;
+            int cows = 0;
+
+            for (int i = 0; i < startNumber.Count; i++)
+            {
+                if (startNumber[i] == currentNumber[i])
+                {
+                    ++bulls;
+                    continue;
+                }
+                for (int j = 0; j < startNumber.Count; j++)
+                {
+                    if (startNumber[i] == currentNumber[j])
+                    {
+                        ++cows;
+                        break;
+                    }
+                }
+            }
+            return new BullsAndCows(bulls, cows);
         }
 
         /// <summary>
@@ -138,12 +168,6 @@ namespace BullsAndCows
                 }
                 isUniqueNumber = true;
             }
-
-            for (int i = 0; i < randNumbers.Count; i++)
-            {
-                Console.Write(randNumbers[i] + " ");
-            }
-            Console.WriteLine();
             return randNumbers;
         }
 
