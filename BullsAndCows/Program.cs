@@ -12,11 +12,6 @@ namespace BullsAndCows
         {
             GameBullsAndCows gameBullsAndCows = new GameBullsAndCows(4, 1);
             gameBullsAndCows.GuessPlayer();
-            //Random rand = new Random();
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    Console.WriteLine(new BullsAndCows(rand.Next(0, 5), rand.Next(0, 5)).GetInfo());
-            //}
         }
     }
 
@@ -104,9 +99,46 @@ namespace BullsAndCows
         /// <summary>
         /// Игрок угадывает число загаданное программой
         /// </summary>
-        public void GuessPlayer()
+        private void GuessPlayer()
         {
             _hideNumber = GetGenerateNumber(_sizeNumber);
+            Console.Write($"Введите число длинной {_sizeNumber}: ");
+            string inputNumber = Console.ReadLine();
+
+            if (IsCorrectInputNumber())
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// Проверка числа, которое ввел пользователь
+        /// </summary>
+        /// <param name="number">число</param>
+        /// <returns></returns>
+        private bool IsCorrectInputNumber(List<int> number)
+        {
+            if (IsCorrectSizeNumber(number.Count))
+            {
+                int uniqueNumber = 0;
+                for (int i = 0; i < number.Count; i++)
+                {
+                    for (int j = 0; j < number.Count; j++)
+                    {
+                        if (number[i] == number[j])
+                            ++uniqueNumber;
+                    }
+                    if (uniqueNumber > 1)
+                    {
+                        throw new Exception("Цифры не должны повторяться");
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                throw new Exception();
+            }
         }
 
         /// <summary>
@@ -180,6 +212,7 @@ namespace BullsAndCows
         {
             if (number < 1 || number > 3)
             {
+                return false;
                 throw new Exception("Режимы игры только - 1, 2, 3.");
             }
             return true;
