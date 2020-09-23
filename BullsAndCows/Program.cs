@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BullsAndCows
 {
@@ -10,8 +7,30 @@ namespace BullsAndCows
     {
         static void Main(string[] args)
         {
-            GameBullsAndCows gameBullsAndCows = new GameBullsAndCows(4, 1);
-            gameBullsAndCows.StartGame();
+            Console.WriteLine("Добро пожаловать в игру \"Быки и коровы\"!");
+            Console.Write("Введите длинну числа: 2 или 3 или 4. -> ");
+            string userInput = Console.ReadLine();
+            int sizeNumber;
+            int numberModeGame;
+            if (int.TryParse(userInput,out sizeNumber))
+            {
+                Console.Write("Введите номер режима игры: 1, 2, 3. ->");
+                userInput = Console.ReadLine();
+                if (int.TryParse(userInput, out numberModeGame))
+                {
+                    GameBullsAndCows gameBullsAndCows = new GameBullsAndCows(sizeNumber, numberModeGame);
+                    gameBullsAndCows.StartGame();
+                }
+                else
+                {
+                    throw new Exception("Введить нужно только цифры!");
+                }
+            }
+            else
+            {
+                throw new Exception("Введить нужно только цифры!");
+            }
+            
         }
     }
 
@@ -56,7 +75,6 @@ namespace BullsAndCows
         private List<int> _guessNumber;
         private int _sizeNumber;
         private int _numberModeGame;
-        private int _countNumbersForBot;
 
         /// <summary>
         /// 
@@ -64,7 +82,7 @@ namespace BullsAndCows
         /// <param name="sizeNumber">длинна числа(2, 3 или 4-х значное число)</param>
         /// <param name="numberModeGame">тип игры (1, 2, 3)</param>
         /// <param name="countNumbersForBot">количество чисел, которое загадает программа боту</param>
-        public GameBullsAndCows(int sizeNumber, int numberModeGame, int countNumbersForBot = 5)
+        public GameBullsAndCows(int sizeNumber, int numberModeGame)
         {
             if (IsCorrectInputSizeNumber(sizeNumber) && IsCorrectNumberModeGame(numberModeGame))
             {
@@ -73,28 +91,35 @@ namespace BullsAndCows
                 _hideNumber = new List<int>(sizeNumber);
                 _guessNumber = new List<int>(sizeNumber);
                 _numberModeGame = numberModeGame;
-                _countNumbersForBot = countNumbersForBot;
             }
         }
 
-        /// <summary>
-        /// Запуск игры
-        /// </summary>
         public void StartGame()
         {
+            Console.Clear();
             switch (_numberModeGame)
             {
                 case 1:
+                    ShowInfoGame("Игрок угадывает");
                     GuessPlayer();
                     break;
                 case 2:
+                    ShowInfoGame("Бот угадывает");
                     GuessBot();
                     break;
                 case 3:
+                    ShowInfoGame("Бот угадывает и выводится статистика его попыток");
                     ShowBotStatistic();
                     break;
             }
         }
+
+
+        private void ShowInfoGame(string name)
+        {
+            Console.WriteLine($"Вы выбрали режим: {name}. Длина числа равна: {_sizeNumber}");
+        }
+
         /// <summary>
         /// Выводит число и номер попытки с которой бот угадал число
         /// </summary>
