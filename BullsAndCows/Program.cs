@@ -15,7 +15,10 @@ namespace BullsAndCows
             int numberModeGame;
             if (int.TryParse(userInput, out sizeNumber))
             {
-                Console.Write("Введите номер режима игры: 1, 2, 3. ->");
+                Console.Write("Введите номер режима игры:\n" +
+                    "\tИгрок угадывает - 1\n" +
+                    "\tБот угадывает - 2\n" +
+                    "\tБот угадывает и выводится статистика его попыток - 3\n ->");
                 userInput = Console.ReadLine();
                 if (int.TryParse(userInput, out numberModeGame))
                 {
