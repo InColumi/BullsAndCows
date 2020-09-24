@@ -166,6 +166,7 @@ namespace BullsAndCows
         /// </summary>
         private void DebagBot()
         {
+            int[] timeCount = new int[10]; 
             List<int[]> allNumbers = GetAllNumbers();
             List<int[]> numbersForGuess;
             bool isCorrect = true;
@@ -179,6 +180,7 @@ namespace BullsAndCows
                     if (countNumbers > 0)
                     {
                         List<int[]> randNumbers = GetRandomNumbers(allNumbers, countNumbers);
+                        int sum = 0;
                         for (int i = 0; i < randNumbers.Count; i++)
                         {
                             bool isNextNumber = true;
@@ -197,7 +199,15 @@ namespace BullsAndCows
                                 }
                                 numbersForGuess = GetNumbersByRule(numbersForGuess, randNumberFromNumbersForGuess, bullsAndCowsFromRandomNumber);
                                 ++countTries;
+                                
                             }
+                            sum += countTries;
+                            timeCount[countTries]++;
+                        }
+                        Console.WriteLine($"Среднее кол-во попыток: {(float)sum / countNumbers}");
+                        for (int i = 1; i < timeCount.Length; i++)
+                        {
+                            Console.WriteLine("\t" + i + " прохода по алгоритму : " + timeCount[i]);
                         }
                         isCorrect = false;
                         continue;
@@ -259,11 +269,6 @@ namespace BullsAndCows
                     {
                         allNumbers = GetNumbersByRule(allNumbers, randomNumber, bullsAndCowsUserInput);
                         ++countTries;
-                        if (allNumbers.Count == 1)
-                        {
-                            ShowInfoGame(randomNumber, countTries);
-                            isGuess = true;
-                        }
                     }
                 }
                 else
