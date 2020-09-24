@@ -8,33 +8,29 @@ namespace BullsAndCows
     {
         static void Main(string[] args)
         {
-            //Console.WriteLine("Добро пожаловать в игру \"Быки и коровы\"!");
-            //Console.Write("Введите длинну числа: 2 или 3 или 4. -> ");
-            //string userInput = Console.ReadLine();
-            //int sizeNumber;
-            //int numberModeGame;
-            //if (int.TryParse(userInput,out sizeNumber))
-            //{
-            //    Console.Write("Введите номер режима игры: 1, 2, 3. ->");
-            //    userInput = Console.ReadLine();
-            //    if (int.TryParse(userInput, out numberModeGame))
-            //    {
-            //        GameBullsAndCows gameBullsAndCows = new GameBullsAndCows(sizeNumber, numberModeGame);
-            //        gameBullsAndCows.StartGame();
-            //    }
-            //    else
-            //    {
-            //        throw new Exception("Введить нужно только цифры!");
-            //    }
-            //}
-            //else
-            //{
-            //    throw new Exception("Введить нужно только цифры!");
-            //}
-
-            GameBullsAndCows gameBullsAndCows = new GameBullsAndCows(4, 2);
-            gameBullsAndCows.StartGame();
-
+            Console.WriteLine("Добро пожаловать в игру \"Быки и коровы\"!");
+            Console.Write("Введите длинну числа: 2 или 3 или 4. -> ");
+            string userInput = Console.ReadLine();
+            int sizeNumber;
+            int numberModeGame;
+            if (int.TryParse(userInput, out sizeNumber))
+            {
+                Console.Write("Введите номер режима игры: 1, 2, 3. ->");
+                userInput = Console.ReadLine();
+                if (int.TryParse(userInput, out numberModeGame))
+                {
+                    GameBullsAndCows gameBullsAndCows = new GameBullsAndCows(sizeNumber, numberModeGame);
+                    gameBullsAndCows.StartGame();
+                }
+                else
+                {
+                    throw new Exception("Введить нужно только цифры!");
+                }
+            }
+            else
+            {
+                throw new Exception("Введить нужно только цифры!");
+            }
             Console.ReadKey();
         }
     }
@@ -150,7 +146,7 @@ namespace BullsAndCows
                     if (_sizeNumber == 4)
                     {
                         ShowInfoGame("Бот угадывает и выводится статистика его попыток");
-                        ShowBotStatistic();
+                        DebagBot();
                     }
                     else
                     {
@@ -166,11 +162,68 @@ namespace BullsAndCows
         }
 
         /// <summary>
-        /// Выводит число и номер попытки с которой бот угадал число
+        /// Бот отгадывает список чисел
         /// </summary>
-        private void ShowBotStatistic()
+        private void DebagBot()
         {
+            List<int[]> allNumbers = GetAllNumbers();
+            List<int[]> numbersForGuess;
+            bool isCorrect = true;
+            while (isCorrect)
+            {
+                Console.Write("Введите сколько чисел нужно угадать:");
+                string userInput = Console.ReadLine();
+                int countNumbers;
+                if (int.TryParse(userInput, out countNumbers))
+                {
+                    if (countNumbers > 0)
+                    {
+                        List<int[]> randNumbers = GetRandomNumbers(allNumbers, countNumbers);
+                        for (int i = 0; i < randNumbers.Count; i++)
+                        {
+                            bool isNextNumber = true;
+                            int countTries = 0;
+                            
+                            numbersForGuess = allNumbers;
+                            while (isNextNumber)
+                            {
+                                int[] randNumberFromNumbersForGuess = numbersForGuess[_rand.Next(0, numbersForGuess.Count)];
+                                BullsAndCows bullsAndCowsFromRandomNumber = GetBullsAndCows(randNumbers[i], randNumberFromNumbersForGuess);
+                                if (bullsAndCowsFromRandomNumber.Bulls == 4)
+                                {
+                                    Console.WriteLine($"Число {ConvertNumberToString(randNumbers[i])} отгадал за {countTries} попыток.");
+                                    isNextNumber = false;
+                                    continue;
+                                }
+                                numbersForGuess = GetNumbersByRule(numbersForGuess, randNumberFromNumbersForGuess, bullsAndCowsFromRandomNumber);
+                                ++countTries;
+                            }
+                        }
+                        isCorrect = false;
+                        continue;
+                    }
+                }
+                Console.WriteLine("Введите корректный данные.");
+                Thread.Sleep(1000);
+                Console.Clear();
+            }
+        }
 
+        /// <summary>
+        /// Вернет список случайных чисел из списка numbers длинной count
+        /// </summary>
+        /// <param name="numbers">список откуда будет браться случайные числа</param>
+        /// <param name="count">размер нового списка</param>
+        /// <returns>список длинной count</returns>
+        private List<int[]> GetRandomNumbers(List<int[]> numbers, int count)
+        {
+            List<int[]> randNumbers = new List<int[]>();
+            while (count > 0)
+            {
+                randNumbers.Add(numbers[_rand.Next(0, numbers.Count)]);
+                --count;
+            }
+            return randNumbers;
         }
 
         /// <summary>
@@ -180,10 +233,10 @@ namespace BullsAndCows
         {
             List<int[]> allNumbers = GetAllNumbers();
             bool isGuess = false;
-            int countRounds = 1;
+            int countTries = 1;
             while (isGuess == false)
             {
-                Console.WriteLine($"Попытка №{countRounds}.");
+                Console.WriteLine($"Попытка №{countTries}.");
                 int[] randomNumber = allNumbers[_rand.Next(0, allNumbers.Count)];
                 Console.Write($"Ваше число {ConvertNumberToString(randomNumber)}? Введите подсказку: \nБыков: ");
                 
@@ -199,16 +252,16 @@ namespace BullsAndCows
                     BullsAndCows bullsAndCowsUserInput = new BullsAndCows(bulls, cows);
                     if (bullsAndCowsUserInput.Bulls == 4)
                     {
-                        ShowInfoGame(randomNumber, countRounds);
+                        ShowInfoGame(randomNumber, countTries);
                         isGuess = true;
                     }
                     else
                     {
                         allNumbers = GetNumbersByRule(allNumbers, randomNumber, bullsAndCowsUserInput);
-                        ++countRounds;
+                        ++countTries;
                         if (allNumbers.Count == 1)
                         {
-                            ShowInfoGame(randomNumber, countRounds);
+                            ShowInfoGame(randomNumber, countTries);
                             isGuess = true;
                         }
                     }
@@ -227,6 +280,13 @@ namespace BullsAndCows
             Console.WriteLine($"Ваше число: {ConvertNumberToString(randomNumber)}. Отгадал с {countRounds} попытки.");
         }
 
+        /// <summary>
+        /// Возвращает список чисел, которые удовлетворяют правилу rule
+        /// </summary>
+        /// <param name="numbers">список чисел</param>
+        /// <param name="number">возможное число</param>
+        /// <param name="rule">кол-во быков и коров</param>
+        /// <returns>список чисел удовлетворяющий правилу rule</returns>
         private List<int[]> GetNumbersByRule(List<int[]> numbers, int[] number, BullsAndCows rule)
         {
 
@@ -238,29 +298,9 @@ namespace BullsAndCows
                 if (rule == bullsAndCows)
                 {
                     newNumbers.Add(numbers[i]);
-                    Console.WriteLine(ConvertNumberToString(numbers[i]));
                 }
             }
             return newNumbers;
-        }
-
-        private List<int[]> GetNumbersByRule1111(List<int[]> numbers, int[] rule)
-        {
-            int countNumbers = 0;
-            List<int[]> newGroup = new List<int[]>();
-            _guessNumber = rule;
-            BullsAndCows firstMove = GetBullsAndCows(_guessNumber, _hideNumber);
-            while (countNumbers < numbers.Count - 1)
-            {
-                ++countNumbers;
-                _guessNumber = numbers[countNumbers];
-                BullsAndCows nextMove = GetBullsAndCows(_guessNumber, _hideNumber);
-                if (firstMove == nextMove)
-                {
-                    newGroup.Add(numbers[countNumbers]);
-                }
-            }
-            return newGroup;
         }
 
         /// <summary>
@@ -526,6 +566,11 @@ namespace BullsAndCows
             return true;
         }
 
+        /// <summary>
+        /// Конертирует число в строку
+        /// </summary>
+        /// <param name="number">число</param>
+        /// <returns>число в виде строки</returns>
         private string ConvertNumberToString(int[] number)
         {
             return "" + number[0] + number[1] + number[2] + number[3];
