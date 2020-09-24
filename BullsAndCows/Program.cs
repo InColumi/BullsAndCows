@@ -63,6 +63,10 @@ namespace BullsAndCows
             {
                 comment = "Сильный ход!";
             }
+            else if (Cows == 4)
+            {
+                comment = "Нормаль так...";
+            }
 
             return $"{Bulls} {bullsWord}, {Cows} {cowsWord} " + comment;
         }
@@ -114,7 +118,6 @@ namespace BullsAndCows
             }
         }
 
-
         private void ShowInfoGame(string name)
         {
             Console.WriteLine($"Вы выбрали режим: {name}. Длина числа равна: {_sizeNumber}");
@@ -133,7 +136,74 @@ namespace BullsAndCows
         /// </summary>
         private void GuessBot()
         {
+            
+        }
 
+        /// <summary>
+        /// Возвращает список всех чисел, которые возможны в игре
+        /// </summary>
+        /// <param name="size">количество чисел(по умолчанию 5040)</param>
+        /// <returns></returns>
+        private List<int[]> GetAllNumbers(int size = 5040)
+        {
+            List<int[]> numbers = new List<int[]>(size);
+            int[] number = new int[4];
+            for (int i = 0; i <= 9; i++)
+            {
+                number[0] = i;
+                for (int j = 0; j <= 9; j++)
+                {
+                    number[1] = j;
+                    if (i == j)
+                    {
+                        continue;
+                    }
+                    for (int k = 0; k <= 9; k++)
+                    {
+                        if (j == k || i == k)
+                        {
+                            continue;
+                        }
+                        number[2] = k;
+                        for (int p = 0; p <= 9; p++)
+                        {
+                            if (k == p || j == p)
+                            {
+                                continue;
+                            }
+                            number[3] = p;
+                            if (CheckNumber(number))
+                            {
+                                numbers.Add(new int[4] { i, j, k, p });
+                            }
+                        }
+                    }
+                }
+            }
+
+            return numbers;
+        }
+
+        /// <summary>
+        /// Проверка числа на уникальность цифр
+        /// </summary>
+        /// <param name="number">число</param>
+        /// <returns></returns>
+        private bool CheckNumber(int[] number)
+        {
+            int countUnique = 0;
+            for (int i = 0; i < number.Length; i++)
+            {
+                for (int j = 0; j < number.Length; j++)
+                {
+                    if (number[i] == number[j])
+                        ++countUnique;
+                }
+                if (countUnique > 1)
+                    return false;
+                countUnique = 0;
+            }
+            return true;
         }
 
         /// <summary>
@@ -199,18 +269,18 @@ namespace BullsAndCows
         /// <summary>
         /// Проверка числа, которое ввел пользователь
         /// </summary>
-        /// <param name="number">число</param>
+        /// <param name="numbersString">число</param>
         /// <returns></returns>
-        private bool IsCorrectInputNumber(string number)
+        private bool IsCorrectInputNumber(string numbersString)
         {
-            if (IsCorrectSizeNumber(number.Length))
+            if (IsCorrectSizeNumber(numbersString.Length))
             {
                 int uniqueNumber = 0;
-                for (int i = 0; i < number.Length; i++)
+                for (int i = 0; i < numbersString.Length; i++)
                 {
-                    for (int j = 0; j < number.Length; j++)
+                    for (int j = 0; j < numbersString.Length; j++)
                     {
-                        if (number[i] == number[j])
+                        if (numbersString[i] == numbersString[j])
                             ++uniqueNumber;
                     }
                     if (uniqueNumber > 1)
